@@ -28,6 +28,7 @@ fn eval_arithmetic_op(list: &[Value], env: &mut Rc<RefCell<Env>>) -> Result<Valu
 
                 Ok(Value::Number(r))
             }
+
             "-" => {
                 // return the negative if there's only 1 argument
                 if tail.len() == 1 {
@@ -77,6 +78,145 @@ fn eval_arithmetic_op(list: &[Value], env: &mut Rc<RefCell<Env>>) -> Result<Valu
                 }
 
                 Ok(Value::Number(r))
+            }
+
+            _ => unreachable!(),
+        },
+
+        _ => unreachable!(),
+    }
+}
+
+fn eval_comparison_op(list: &[Value], env: &mut Rc<RefCell<Env>>) -> Result<Value, String> {
+    let head = &list[0];
+    let tail = &list[1..];
+
+    match head {
+        Value::Symbol(s) => match s.as_str() {
+            ">" => {
+                let mut r: bool = true;
+                if tail.len() < 2 {
+                    return Err(String::from("\">\" requires at least 2 arguments"));
+                }
+
+                for i in 1..tail.len() {
+                    match (eval_value(&tail[i - 1], env)?, eval_value(&tail[i], env)?) {
+                        (Value::Number(a), Value::Number(b)) => {
+                            if !(a > b) {
+                                r = false;
+                                break;
+                            }
+                        }
+                        _ => return Err(String::from("All arguments must be numbers")),
+                    }
+                }
+
+                Ok(Value::Bool(r))
+            }
+
+            "<" => {
+                let mut r: bool = true;
+                if tail.len() < 2 {
+                    return Err(String::from("\"<\" requires at least 2 arguments"));
+                }
+
+                for i in 1..tail.len() {
+                    match (eval_value(&tail[i - 1], env)?, eval_value(&tail[i], env)?) {
+                        (Value::Number(a), Value::Number(b)) => {
+                            if !(a < b) {
+                                r = false;
+                                break;
+                            }
+                        }
+                        _ => return Err(String::from("All arguments must be numbers")),
+                    }
+                }
+
+                Ok(Value::Bool(r))
+            }
+
+            ">=" => {
+                let mut r: bool = true;
+                if tail.len() < 2 {
+                    return Err(String::from("\">=\" requires at least 2 arguments"));
+                }
+
+                for i in 1..tail.len() {
+                    match (eval_value(&tail[i - 1], env)?, eval_value(&tail[i], env)?) {
+                        (Value::Number(a), Value::Number(b)) => {
+                            if !(a >= b) {
+                                r = false;
+                                break;
+                            }
+                        }
+                        _ => return Err(String::from("All arguments must be numbers")),
+                    }
+                }
+
+                Ok(Value::Bool(r))
+            }
+
+            "<=" => {
+                let mut r: bool = true;
+                if tail.len() < 2 {
+                    return Err(String::from("\"<=\" requires at least 2 arguments"));
+                }
+
+                for i in 1..tail.len() {
+                    match (eval_value(&tail[i - 1], env)?, eval_value(&tail[i], env)?) {
+                        (Value::Number(a), Value::Number(b)) => {
+                            if !(a <= b) {
+                                r = false;
+                                break;
+                            }
+                        }
+                        _ => return Err(String::from("All arguments must be numbers")),
+                    }
+                }
+
+                Ok(Value::Bool(r))
+            }
+
+            "=" => {
+                let mut r: bool = true;
+                if tail.len() < 2 {
+                    return Err(String::from("\"=\" requires at least 2 arguments"));
+                }
+
+                for i in 1..tail.len() {
+                    match (eval_value(&tail[i - 1], env)?, eval_value(&tail[i], env)?) {
+                        (Value::Number(a), Value::Number(b)) => {
+                            if !(a == b) {
+                                r = false;
+                                break;
+                            }
+                        }
+                        _ => return Err(String::from("All arguments must be numbers")),
+                    }
+                }
+
+                Ok(Value::Bool(r))
+            }
+
+            "!=" => {
+                let mut r: bool = true;
+                if tail.len() < 2 {
+                    return Err(String::from("\"!=\" requires at least 2 arguments"));
+                }
+
+                for i in 1..tail.len() {
+                    match (eval_value(&tail[i - 1], env)?, eval_value(&tail[i], env)?) {
+                        (Value::Number(a), Value::Number(b)) => {
+                            if !(a != b) {
+                                r = false;
+                                break;
+                            }
+                        }
+                        _ => return Err(String::from("All arguments must be numbers")),
+                    }
+                }
+
+                Ok(Value::Bool(r))
             }
 
             _ => unreachable!(),
@@ -237,7 +377,7 @@ fn eval_list(list: &[Value], env: &mut Rc<RefCell<Env>>) -> Result<Value, String
                 return eval_arithmetic_op(&list, env);
             }
             "=" | "!=" | "<" | ">" | "<=" | ">=" => {
-                todo!()
+                return eval_comparison_op(&list, env);
             }
             "and" | "or" | "not" => {
                 todo!()

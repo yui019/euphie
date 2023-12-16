@@ -1,7 +1,6 @@
-(let ((a 1) (b 2))
-    (def avg (lambda (x y z) (/ (+ x y z) 3)))
+(let ()
+    (def fact (lambda (x)
+        (if (= x 1) 1 (* x (fact (- x 1))))))
 
-    (let ((c 5))
-        (avg a b c)
-    )
+    (fact 5)
 )

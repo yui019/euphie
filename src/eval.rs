@@ -111,7 +111,11 @@ fn eval_comparison_op(list: &[Value], env: &mut Rc<RefCell<Env>>) -> Result<Valu
                     }
                 }
 
-                Ok(Value::Bool(r))
+                if r {
+                    Ok(Value::T)
+                } else {
+                    Ok(Value::Nil)
+                }
             }
 
             "<" => {
@@ -132,7 +136,11 @@ fn eval_comparison_op(list: &[Value], env: &mut Rc<RefCell<Env>>) -> Result<Valu
                     }
                 }
 
-                Ok(Value::Bool(r))
+                if r {
+                    Ok(Value::T)
+                } else {
+                    Ok(Value::Nil)
+                }
             }
 
             ">=" => {
@@ -153,7 +161,11 @@ fn eval_comparison_op(list: &[Value], env: &mut Rc<RefCell<Env>>) -> Result<Valu
                     }
                 }
 
-                Ok(Value::Bool(r))
+                if r {
+                    Ok(Value::T)
+                } else {
+                    Ok(Value::Nil)
+                }
             }
 
             "<=" => {
@@ -174,7 +186,11 @@ fn eval_comparison_op(list: &[Value], env: &mut Rc<RefCell<Env>>) -> Result<Valu
                     }
                 }
 
-                Ok(Value::Bool(r))
+                if r {
+                    Ok(Value::T)
+                } else {
+                    Ok(Value::Nil)
+                }
             }
 
             "=" => {
@@ -195,7 +211,11 @@ fn eval_comparison_op(list: &[Value], env: &mut Rc<RefCell<Env>>) -> Result<Valu
                     }
                 }
 
-                Ok(Value::Bool(r))
+                if r {
+                    Ok(Value::T)
+                } else {
+                    Ok(Value::Nil)
+                }
             }
 
             "!=" => {
@@ -216,7 +236,11 @@ fn eval_comparison_op(list: &[Value], env: &mut Rc<RefCell<Env>>) -> Result<Valu
                     }
                 }
 
-                Ok(Value::Bool(r))
+                if r {
+                    Ok(Value::T)
+                } else {
+                    Ok(Value::Nil)
+                }
             }
 
             _ => unreachable!(),
@@ -234,7 +258,8 @@ fn eval_if(list: &[Value], env: &mut Rc<RefCell<Env>>) -> Result<Value, String> 
 
     let cond_obj = eval_value(&list[1], env)?;
     let cond = match cond_obj {
-        Value::Bool(b) => b,
+        Value::T => true,
+        Value::Nil => false,
         _ => return Err(format!("Condition must be a bool")),
     };
 
@@ -370,6 +395,11 @@ fn eval_let(list: &[Value], env: &mut Rc<RefCell<Env>>) -> Result<Value, String>
 }
 
 fn eval_list(list: &[Value], env: &mut Rc<RefCell<Env>>) -> Result<Value, String> {
+    // handle empty list
+    if list.len() == 0 {
+        return Ok(Value::Nil);
+    }
+
     let head = &list[0];
     match head {
         Value::Symbol(s) => match s.as_str() {
@@ -396,9 +426,9 @@ fn eval_list(list: &[Value], env: &mut Rc<RefCell<Env>>) -> Result<Value, String
 pub fn eval_value(value: &Value, env: &mut Rc<RefCell<Env>>) -> Result<Value, String> {
     match value {
         Value::Nil => Ok(Value::Nil),
+        Value::T => Ok(Value::T),
         Value::Number(n) => Ok(Value::Number(*n)),
         Value::String(s) => Ok(Value::String(s.clone())),
-        Value::Bool(b) => Ok(Value::Bool(*b)),
         Value::Symbol(s) => eval_symbol(s, env),
         Value::Lambda { params, body } => Ok(Value::Lambda {
             params: params.clone(),

@@ -2,9 +2,10 @@ use std::str;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token {
+    Nil,
+    T,
     Number(f64),
     String(String),
-    Bool(bool),
     Symbol(String),
     StartParen,
     EndParen,
@@ -52,10 +53,10 @@ pub fn tokenize(code: String) -> Vec<Token> {
 
             let substr = String::from(str::from_utf8(&code.as_bytes()[i..j]).unwrap());
 
-            if substr == "true" {
-                tokens.push(Token::Bool(true))
-            } else if substr == "false" {
-                tokens.push(Token::Bool(false))
+            if substr == "nil" {
+                tokens.push(Token::Nil)
+            } else if substr == "t" {
+                tokens.push(Token::T)
             } else {
                 match substr.parse::<f64>() {
                     Ok(n) => tokens.push(Token::Number(n)),

@@ -11,6 +11,7 @@ pub enum Value {
     Lambda {
         params: Vec<String>,
         body: Rc<Value>,
+        is_macro: bool,
     },
     List(Vec<Value>),
 }

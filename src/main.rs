@@ -1,4 +1,4 @@
-use euphie::{env::*, eval::*, parse::*, tokenize::*};
+use euphie::{env::*, eval::*, parse::*, tokenize::*, util::*};
 use std::{cell::RefCell, fs, rc::Rc};
 
 fn main() {
@@ -9,5 +9,5 @@ fn main() {
     let tree = parse(&mut tokens).unwrap();
 
     let result = eval_value(&tree, &mut Rc::from(RefCell::from(Env::new())));
-    println!("Result: {:?}", result.unwrap());
+    println!("Result: {}", value_to_string(&result.unwrap()));
 }

@@ -10,9 +10,9 @@ pub fn value_to_string(value: &Value) -> String {
         Value::Lambda {
             params, is_macro, ..
         } => format!(
-            "<{} ({})>",
+            "<{} ({:?})>",
             if *is_macro { "macro" } else { "lambda" },
-            params.join(" ")
+            params
         ),
         Value::List(l) => format!(
             "({})",

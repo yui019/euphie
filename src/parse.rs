@@ -1,5 +1,27 @@
 use crate::{tokenize::*, util::value_to_string};
+use core::fmt::Debug;
 use std::rc::Rc;
+
+#[derive(Clone, PartialEq)]
+pub struct LambdaParams {
+    pub required: Vec<String>,
+    pub optional: Vec<String>,
+    pub keyword: Vec<String>,
+    pub rest: Option<String>,
+}
+
+impl Debug for LambdaParams {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "required: [{}], optional: [{}], keyword: [{}], rest: [{}]",
+            self.required.join(" "),
+            self.optional.join(" "),
+            self.keyword.join(" "),
+            self.rest.clone().unwrap_or(String::from(""))
+        )
+    }
+}
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Value {
@@ -9,7 +31,7 @@ pub enum Value {
     String(String),
     Symbol(String),
     Lambda {
-        params: Vec<String>,
+        params: LambdaParams,
         body: Rc<Value>,
         is_macro: bool,
     },

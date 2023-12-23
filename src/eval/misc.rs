@@ -3,6 +3,11 @@ use crate::{env::*, parse::*};
 use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
 pub fn eval_symbol(symbol: &String, env: &mut Rc<RefCell<Env>>) -> Result<Value, String> {
+    // if it's a keyword, just return it (it doesn't get evaluated by looking up its value)
+    if symbol.starts_with(":") {
+        return Ok(Value::Symbol(symbol.clone()));
+    }
+
     let val = env.borrow().get(symbol);
 
     if val.is_none() {

@@ -240,3 +240,53 @@ pub fn eval_comparison_op(list: &[Value], env: &mut Rc<RefCell<Env>>) -> Result<
         _ => unreachable!(),
     }
 }
+
+pub fn eval_logic_op(list: &[Value], env: &mut Rc<RefCell<Env>>) -> Result<Value, String> {
+    let head = &list[0];
+    let tail = &list[1..];
+
+    match head {
+        Value::Symbol(s) => match s.as_str() {
+            "and" => {
+                for v in tail {
+                    match eval_value(v, env)? {
+                        // early return if it's nil
+                        Value::Nil => return Ok(Value::Nil),
+                        _ => {}
+                    }
+                }
+
+                // return the value of the last element
+                Ok(tail[tail.len() - 1].clone())
+            }
+
+            "or" => {
+                for v in tail {
+                    match eval_value(v, env)? {
+                        // skip if it's nil
+                        Value::Nil => {}
+                        // early return if it's not nil
+                        value => return Ok(value),
+                    }
+                }
+
+                Ok(Value::Nil)
+            }
+
+            "not" => {
+                if tail.len() != 1 {
+                    return Err(String::from("\"not\" requires 1 argument"));
+                }
+
+                match tail[0] {
+                    Value::Nil => Ok(Value::T),
+                    _ => Ok(Value::Nil),
+                }
+            }
+
+            _ => unreachable!(),
+        },
+
+        _ => unreachable!(),
+    }
+}

@@ -290,3 +290,61 @@ pub fn eval_logic_op(list: &[Value], env: &mut Rc<RefCell<Env>>) -> Result<Value
         _ => unreachable!(),
     }
 }
+
+pub fn eval_list_op(list: &[Value], env: &mut Rc<RefCell<Env>>) -> Result<Value, String> {
+    let head = &list[0];
+    let tail = &list[1..];
+
+    match head {
+        Value::Symbol(s) => match s.as_str() {
+            "car" => {
+                if tail.len() != 1 {
+                    return Err(String::from("\"car\" requires 1 argument"));
+                }
+
+                match eval_value(&tail[0], env)? {
+                    Value::List(l) => {
+                        if l.len() == 0 {
+                            Ok(Value::Nil)
+                        } else {
+                            Ok(l[0].clone())
+                        }
+                    }
+                    _ => Err(String::from("Argument needs to be a list")),
+                }
+            }
+
+            "cdr" => {
+                if tail.len() != 1 {
+                    return Err(String::from("\"cdr\" requires 1 argument"));
+                }
+
+                match eval_value(&tail[0], env)? {
+                    Value::List(l) => {
+                        if l.len() < 2 {
+                            Ok(Value::Nil)
+                        } else {
+                            Ok(Value::List(l[1..].to_vec()))
+                        }
+                    }
+                    _ => Err(String::from("Argument needs to be a list")),
+                }
+            }
+
+            "len" => {
+                if tail.len() != 1 {
+                    return Err(String::from("\"len\" requires 1 argument"));
+                }
+
+                match eval_value(&tail[0], env)? {
+                    Value::List(l) => Ok(Value::Number(l.len() as f64)),
+                    _ => Err(String::from("Argument needs to be a list")),
+                }
+            }
+
+            _ => unreachable!(),
+        },
+
+        _ => unreachable!(),
+    }
+}

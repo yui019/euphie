@@ -18,7 +18,7 @@ fn eval_list(list: &[Value], env: &mut Rc<RefCell<Env>>) -> Result<Value, String
             "+" | "-" | "*" | "/" => eval_arithmetic_op(&list, env),
             "=" | "!=" | "<" | ">" | "<=" | ">=" => eval_comparison_op(&list, env),
             "and" | "or" | "not" => eval_logic_op(&list, env),
-            // "car" | "cdr" | "cons" | "append" | "len" => eval_list_op(&list, env),
+            "car" | "cdr" | "len" => eval_list_op(&list, env),
             "if" => eval_if(&list, env),
             "def" => eval_def(&list, env),
             "lambda" => eval_fun_definition(&list, env),
